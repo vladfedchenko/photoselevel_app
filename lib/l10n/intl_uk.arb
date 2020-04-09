@@ -1,0 +1,128 @@
+{
+  "@@locale": "uk",
+  "hello": "Привіт",
+  "@hello": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "title": "photoseleven",
+  "@title": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "Логін",
+  "@login": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "register": "Регістрація",
+  "@register": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "server": "Сервер",
+  "@server": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "testConnection": "Перевірити з'єднання",
+  "@testConnection": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "username": "Користувач",
+  "@username": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "Пароль",
+  "@password": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "connectionStatus": "Стан з'єднання",
+  "@connectionStatus": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverEmpty": "Ім'я сервера відсутнє.",
+  "@serverEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverFormatWrong": "Помилка формату імені сервера. Ім'я сервера має починатися на http(s):// і заканчуватися на /.",
+  "@serverFormatWrong": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionFailed": "Неможливо зв'язатися з сервером {server}.",
+  "@serverConnectionFailed": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionSuccessful": "Зв'язок з сервером {server} встановлено.",
+  "@serverConnectionSuccessful": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginInfoEmpty": "Ім'я користувача або пароль відсутні.",
+  "@loginInfoEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "timeoutExceeded": "Час очікування перевищено при спробі зв'язку з сервером {server}.",
+  "@timeoutExceeded": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownLoginError": "Невідома помилка при спробі логіну.",
+  "@unknownLoginError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noUsernameProvided": "Ім'я користувача не введено.",
+  "@noUsernameProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noPasswordProvided": "Пароль не введений.",
+  "@noPasswordProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userDontExist": "Користувач з введеним іменем не існує.",
+  "@userDontExist": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "wrongPassword": "Неправильний пароль.",
+  "@wrongPassword": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordInvalid": "Має мати не менше 8 символів.",
+  "@passwordInvalid": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userAlreadyExists": "Користувач з введеним іменем вже існує.",
+  "@userAlreadyExists": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "registeredSuccessfully": "Користувач {user} зареєстрований успішно.",
+  "@registeredSuccessfully": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownRegisterError": "Невідома помилка при спробі реєстрації.",
+  "@unknownRegisterError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noStoragePermission": "Необхідно надати доступ до сховища.",
+  "@noStoragePermission": {
+    "type": "text",
+    "placeholders": {}
+  }
+}

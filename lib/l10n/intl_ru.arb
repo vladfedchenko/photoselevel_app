@@ -1,0 +1,128 @@
+{
+  "@@locale": "ru",
+  "hello": "Привет",
+  "@hello": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "title": "photoseleven",
+  "@title": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "Логин",
+  "@login": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "register": "Регистрация",
+  "@register": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "server": "Сервер",
+  "@server": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "testConnection": "Проверить соединение",
+  "@testConnection": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "username": "Пользователь",
+  "@username": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "Пароль",
+  "@password": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "connectionStatus": "Состояние соединения",
+  "@connectionStatus": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverEmpty": "Имя сервера отсутствует.",
+  "@serverEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverFormatWrong": "Ошибка формата имени сервера. Имя сервера должно начинаться с http(s):// и заканчиваться на /.",
+  "@serverFormatWrong": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionFailed": "Невозможно связаться с сервером {server}.",
+  "@serverConnectionFailed": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionSuccessful": "Связь с сервером {server} установлена.",
+  "@serverConnectionSuccessful": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginInfoEmpty": "Имя пользователя или пароль отсутствуют.",
+  "@loginInfoEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "timeoutExceeded": "Время ожидания превышено при попытке связи с сервером {server}.",
+  "@timeoutExceeded": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownLoginError": "Неизвестная ошибка при попытке логина.",
+  "@unknownLoginError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noUsernameProvided": "Имя пользователя не введено.",
+  "@noUsernameProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noPasswordProvided": "Пароль отсутствует.",
+  "@noPasswordProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userDontExist": "Пользователь не существует.",
+  "@userDontExist": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "wrongPassword": "Неправильний пароль.",
+  "@wrongPassword": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordInvalid": "Должен иметь не менее 8 символов.",
+  "@passwordInvalid": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userAlreadyExists": "Пользователь с введённым именем уже существует.",
+  "@userAlreadyExists": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "registeredSuccessfully": "Пользователь {user} зарегистрирован успешно.",
+  "@registeredSuccessfully": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownRegisterError": "Неизвестная ошибка при попытке регистрации.",
+  "@unknownRegisterError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noStoragePermission": "Необходино предоставить доступ к хранилищу.",
+  "@noStoragePermission": {
+    "type": "text",
+    "placeholders": {}
+  }
+}

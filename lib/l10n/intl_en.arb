@@ -1,0 +1,128 @@
+{
+  "@@locale": "en",
+  "hello": "Hello",
+  "@hello": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "title": "photoseleven",
+  "@title": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "Login",
+  "@login": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "register": "Register",
+  "@register": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "server": "Server",
+  "@server": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "testConnection": "Test connection",
+  "@testConnection": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "username": "Username",
+  "@username": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "Password",
+  "@password": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "connectionStatus": "Connection status",
+  "@connectionStatus": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverEmpty": "Server name empty.",
+  "@serverEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverFormatWrong": "Server name format is wrong. Server name must begin with http(s):// and end with /.",
+  "@serverFormatWrong": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionFailed": "Cannot establish connection with server {server}.",
+  "@serverConnectionFailed": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "serverConnectionSuccessful": "Connection with server {server} established.",
+  "@serverConnectionSuccessful": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginInfoEmpty": "Both username and password must be entered.",
+  "@loginInfoEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "timeoutExceeded": "Timeout time exceeded while trying to connect to {server}.",
+  "@timeoutExceeded": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownLoginError": "Unknown error while trying to login.",
+  "@unknownLoginError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noUsernameProvided": "No username provided.",
+  "@noUsernameProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noPasswordProvided": "No password provided.",
+  "@noPasswordProvided": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userDontExist": "User with entered username does not exist.",
+  "@userDontExist": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "wrongPassword": "Wrong password.",
+  "@wrongPassword": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordInvalid": "Must be at least 8 characters long.",
+  "@passwordInvalid": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "userAlreadyExists": "User already exists.",
+  "@userAlreadyExists": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "registeredSuccessfully": "User {user} registered successfully.",
+  "@registeredSuccessfully": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownRegisterError": "Unknown error while trying to register.",
+  "@unknownRegisterError": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "noStoragePermission": "External storage access is required.",
+  "@noStoragePermission": {
+    "type": "text",
+    "placeholders": {}
+  }
+}
