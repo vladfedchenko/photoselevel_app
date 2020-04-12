@@ -23,9 +23,15 @@ class PhotoselevenApp extends StatelessWidget {
       title: 'photoseleven',
       onGenerateTitle: (context) => S.of(context).title,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primaryColor: Colors.black,
       ),
-      home: GalleryScreen()
+      initialRoute: '/galery',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/galery': (context) => GalleryScreen(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/login': (context) => LoginScreen(),
+      },
     );
   }
 }

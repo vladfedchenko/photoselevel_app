@@ -1,51 +1,67 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
 
-class Photo {
-  final Uri _uri;
-  final DateTime _createdOn;
-  bool _isLocal;
+import 'package:moor/moor.dart';
 
-  Photo({@required Uri uri, @required DateTime createdOn, bool isLocal = true})
-      : _uri = uri,
-        _createdOn = createdOn,
-        _isLocal = isLocal;
+import 'db.dart';
 
-  DateTime get createdOn => _createdOn;
+class Photos extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  IntColumn get album => integer()();
+
+  TextColumn get localUrl => text().nullable()();
+
+  TextColumn get remoteUrl => text().nullable()();
+
+  TextColumn get createdOnText => text()();
+
+  BoolColumn get existLocal => boolean().withDefault(const Constant(true))();
+
+  BoolColumn get existRemote => boolean().withDefault(const Constant(false))();
 }
 
-class Album {
-  final DateTime _date;
-  final Set<Photo> _photos = Set<Photo>();
-  List<Photo> _sortedByTime = List<Photo>();
+class Albums extends Table {
+  IntColumn get id => integer().autoIncrement()();
 
-  Album({@required DateTime date}) : _date = date;
+  DateTimeColumn get date => dateTime()();
 
-  void addPhotos(Iterable<Photo> photos) {
-    this._photos.addAll(photos);
-    this._reloadSortedList();
-  }
+  IntColumn get photosCount => integer().withDefault(const Constant(0))();
+}
 
-  void addPhoto(Photo photo) {
-    if (this._photos.add(photo)) {
-      this._reloadSortedList();
+class AlbumWithPhotos {
+  final Album album;
+  Future<List<Photo>> _photosOrdered;
+  Future<Set<DateTime>> _photoDates;
+
+  AlbumWithPhotos(this.album);
+
+  Future<Set<DateTime>> get photoDates {
+    if (_photoDates == null) {
+      _photoDates = this.photosOrdered.then(
+          (l) => Set()..addAll(l.map((p) => DateTime.parse(p.createdOnText))));
     }
+    return _photoDates;
   }
 
-  void _reloadSortedList(){
-    _sortedByTime = this._photos.toList();
-    _sortedByTime.sort((a, b) => a.createdOn.compareTo(b.createdOn));
-  }
-
-  void removePhotos(Iterable<Photo> photos) {
-    this._photos.removeAll(photos);
-    this._reloadSortedList();
-  }
-
-  void removePhoto(Photo photo) {
-    if (this._photos.remove(photo)) {
-      this._reloadSortedList();
+  Future<List<Photo>> get photosOrdered {
+    if (this._photosOrdered == null) {
+      _photosOrdered = PhotoselevenDB().getAlbumPhotosOrdered(album);
     }
+    return _photosOrdered;
   }
 
-  List<Photo> get sortedByTime => this._sortedByTime;
+  void _reloadPhotos() {
+    this._photosOrdered = null; // will be fetched lazily when requested
+    this._photoDates = null;
+  }
+
+  Future<void> addPhoto(
+      {@required DateTime createdOn, @required String localUrl}) async {
+    await PhotoselevenDB().insertPhoto(PhotosCompanion(
+      album: Value(album.id),
+      createdOnText: Value(createdOn.toString()),
+      localUrl: Value(localUrl),
+    ));
+    this._reloadPhotos();
+  }
 }
