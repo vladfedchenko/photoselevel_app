@@ -12,7 +12,7 @@ part 'db.g.dart';
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db_dev.sqlite'));
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
     return VmDatabase(file);
   });
 }
@@ -32,32 +32,37 @@ class PhotoselevenDB extends _$PhotoselevenDB {
 
   Future<List<Album>> get allAlbums => select(albums).get();
 
-  Future<List<Album>> get allAlbumsDescending => (select(albums)
+  Future<List<Album>> get allAlbumsDescending =>
+      (select(albums)
         ..orderBy(
             [(a) => OrderingTerm(expression: a.date, mode: OrderingMode.desc)]))
-      .get();
+          .get();
 
   Future<Album> getAlbumOnDate(DateTime date) {
-    return (select(albums)..where((a) => a.date.equals(date))).getSingle();
+    return (select(albums)
+      ..where((a) => a.date.equals(date))).getSingle();
   }
 
   Future<List<Photo>> getAlbumPhotos(Album album) {
-    return (select(photos)..where((p) => p.album.equals(album.id))).get();
+    return (select(photos)
+      ..where((p) => p.album.equals(album.id))).get();
   }
 
   Future<List<Photo>> getAlbumPhotosOrdered(Album album) {
     return (select(photos)
-          ..where((p) => p.album.equals(album.id))
-          ..orderBy([
-            (p) => OrderingTerm(
+      ..where((p) => p.album.equals(album.id))
+      ..orderBy([
+            (p) =>
+            OrderingTerm(
                 expression: p.createdOnText, mode: OrderingMode.desc)
-          ]))
+      ]))
         .get();
   }
 
   Future<Album> insertAlbum(AlbumsCompanion album) async {
     int id = await into(albums).insert(album);
-    return (select(albums)..where((a) => a.id.equals(id))).getSingle();
+    return (select(albums)
+      ..where((a) => a.id.equals(id))).getSingle();
   }
 
   Future<Photo> insertPhoto(PhotosCompanion photosCompanion) async {
@@ -65,10 +70,11 @@ class PhotoselevenDB extends _$PhotoselevenDB {
       int id = await into(photos).insert(photosCompanion);
 
       var album = await (select(albums)
-            ..where((a) => a.id.equals(photosCompanion.album.value)))
+        ..where((a) => a.id.equals(photosCompanion.album.value)))
           .getSingle();
 
-      await (update(albums)..where((a) => a.id.equals(album.id))).write(
+      await (update(albums)
+        ..where((a) => a.id.equals(album.id))).write(
         AlbumsCompanion(
           id: Value(album.id),
           date: Value(album.date),
@@ -79,6 +85,21 @@ class PhotoselevenDB extends _$PhotoselevenDB {
       return id;
     });
 
-    return (select(photos)..where((a) => a.id.equals(photoID))).getSingle();
+    return (select(photos)
+      ..where((a) => a.id.equals(photoID))).getSingle();
   }
+
+  Future<void> dropAllData() async {
+    transaction(() async {
+      var delPhotos = delete(photos).go();
+      var delAlbums = delete(albums).go();
+
+      await delPhotos;
+      await delAlbums;
+    });
+  }
+
+  Future<List<Photo>> get unuploadedPhotos =>
+      (select(photos)
+        ..where((p) => p.existRemote.equals(false))).get();
 }

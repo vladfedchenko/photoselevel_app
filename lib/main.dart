@@ -25,11 +25,9 @@ class PhotoselevenApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.black,
       ),
-      initialRoute: '/galery',
+      initialRoute: '/gallery',
       routes: {
-        // When navigating to the "/" route, build the FirstScreen widget.
-        '/galery': (context) => GalleryScreen(),
-        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/gallery': (context) => GalleryScreen(),
         '/login': (context) => LoginScreen(),
       },
     );

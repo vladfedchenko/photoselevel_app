@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:app/models/db.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:permission_handler/permission_handler.dart';// TODO: remove after test
 
 import 'generated/l10n.dart';
 
@@ -108,18 +107,18 @@ class _LoginScreenState extends State<LoginScreen> {
     return message;
   }
 
-  Future<void> _loginPressed() async {
-    // Directory tmp = Directory('/storage/emulated/1/DCIM/Camera');
-    Directory tmp = Directory('/storage/emulated/0/DCIM/Camera');
-    if (await Permission.storage.request().isGranted) {
-      print(tmp.existsSync());
-      for (var item in tmp.listSync()) {
-        print(item.path);
-      }
+  Future<void> _loginOK() async {
+    // After login OK removing any remaining data from previous sessions
+    await PhotoselevenDB().dropAllData();
+    var sp = await SharedPreferences.getInstance();
+    if (sp.containsKey('mediaLoadTime')) {
+      await sp.remove('mediaLoadTime');
     }
+    Navigator.pushReplacementNamed(context, '/gallery');
+  }
 
-//    print((await getExternalStorageDirectories(type: StorageDirectory.dcim))[0]
-//        .path); // TODO: remove
+
+  Future<void> _loginPressed() async {
 
     bool connectionOk = await _testConnection(showAlerts: true);
     if (connectionOk) {
@@ -160,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
             sp.setString("accessToken", respJson['token']);
             sp.setString("username", _username);
 
-            // TODO: redirect to the main screen
+            _loginOK();
           }
         } on TimeoutException {
           _showDialogWrapper(

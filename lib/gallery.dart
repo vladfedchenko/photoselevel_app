@@ -29,7 +29,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   Map<DateTime, AlbumWithPhotos> _albums = Map<DateTime, AlbumWithPhotos>();
   List<AlbumWithPhotos> _sortedAlbums = List<AlbumWithPhotos>();
   bool _loadOngoing = false;
-  Future<void> _initialLoadFinished;
+  Future<bool> _initialLoadFinished;
 
   Widget _buildGallery() {
     return ListView.separated(
@@ -63,8 +63,13 @@ class _GalleryScreenState extends State<GalleryScreen>
     });
   }
 
-  Future<void> _loadAlbumsFromDB() async {
-    var sp = SharedPreferences.getInstance();
+  Future<bool> _doInitialLoad() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+    if (!(_sharedPreferences.containsKey('username'))) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return false;
+    }
+
     var albumsList = await PhotoselevenDB().allAlbums;
     for (var album in albumsList) {
       this._albums[album.date] = AlbumWithPhotos(album);
@@ -73,14 +78,15 @@ class _GalleryScreenState extends State<GalleryScreen>
     this._sortedAlbums = this._albums.values.toList();
     this._sortedAlbums.sort((a, b) => b.album.date.compareTo(a.album.date));
 
-    _sharedPreferences = await sp;
     if (_sharedPreferences.containsKey('mediaLoadTime')) {
       _processedTime =
           DateTime.parse(_sharedPreferences.getString('mediaLoadTime'));
     }
+    _tryLoadNewData();  // careful here, possible deadlock
+    return true;
   }
 
-  Future<void> _loadNewPhotos(List<File> photosList) async {
+  Future<void> _loadNewLocalPhotos(List<File> photosList) async {
     for (File photoFile in photosList) {
       var exifData = await readExifFromBytes(await photoFile.readAsBytes());
       if (exifData.containsKey('EXIF DateTimeOriginal') &&
@@ -124,9 +130,9 @@ class _GalleryScreenState extends State<GalleryScreen>
     );
   }
 
-  Future<void> _onPermissionChanged(bool newPermission) async {
-    if (newPermission) {
-      if (!_loadOngoing) {
+  Future<void> _tryLoadNewData() async {
+    if (await _allowedStorage) {
+      if (await _initialLoadFinished && !_loadOngoing) {
         _loadOngoing = true;
         var photosList = _mediaDir
             .list(recursive: true)
@@ -136,15 +142,20 @@ class _GalleryScreenState extends State<GalleryScreen>
                 (f) => f.lastModifiedSync().compareTo(this._processedTime) > 0)
             .where((el) => el.path.endsWith('jpg'))
             .toList();
-
-        await _initialLoadFinished;
-        await this._loadNewPhotos(await photosList);
+        await this._loadNewLocalPhotos(await photosList);
         this._processedTime = DateTime.now();
         _sharedPreferences.setString(
             'mediaLoadTime', this._processedTime.toString());
+
+        await _uploadNewPhotos();
+
         _loadOngoing = false;
       }
     }
+  }
+
+  Future<void> _uploadNewPhotos() async {
+    // TODO: photos upload. Finish after backend part is improved.
   }
 
   @override
@@ -175,7 +186,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _allowedStorage.then((value) => this._onPermissionChanged(value));
+      _tryLoadNewData();
     }
   }
 
@@ -187,8 +198,8 @@ class _GalleryScreenState extends State<GalleryScreen>
 
   @override
   void initState() {
-    _initialLoadFinished = _loadAlbumsFromDB();
-    _allowedStorage.then((value) => this._onPermissionChanged(value));
+    print('Init state called!');
+    _initialLoadFinished = _doInitialLoad();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
