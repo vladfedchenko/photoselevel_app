@@ -50,7 +50,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "serverFormatWrong": "Server name format is wrong. Server name must begin with http(s):// and end with /.",
+  "serverFormatWrong": "Server name format is wrong. Server name must begin with http(s):// and not end with /.",
   "@serverFormatWrong": {
     "type": "text",
     "placeholders": {}

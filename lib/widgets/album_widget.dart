@@ -79,7 +79,9 @@ class _AlbumWidgetState extends State<AlbumWidget> {
           aspectRatio: 1,
           child: Padding(
             padding: EdgeInsets.all(1),
-            child: Container(color: Theme.of(context).errorColor,),
+            child: Container(
+              color: Theme.of(context).errorColor,
+            ),
           ),
         ),
       );
@@ -105,6 +107,25 @@ class _AlbumWidgetState extends State<AlbumWidget> {
     return Text(_album.album.date.toString());
   }
 
+  void _photosResetCallback() {
+    setState(() {
+      this._photosReady = false;
+    });
+
+    this._album.photosOrdered.then((value) {
+      setState(() {
+        this._photosReady = true;
+        this._photos = value;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    this._album.removePhotoResetCallback(this._photosResetCallback);
+    super.dispose();
+  }
+
   @override
   void initState() {
     this._album.photosOrdered.then((value) {
@@ -113,6 +134,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
         this._photos = value;
       });
     });
+    this._album.addPhotoResetCallback(this._photosResetCallback);
     super.initState();
   }
 }

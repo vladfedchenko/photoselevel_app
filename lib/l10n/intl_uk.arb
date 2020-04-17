@@ -50,7 +50,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "serverFormatWrong": "Помилка формату імені сервера. Ім'я сервера має починатися на http(s):// і заканчуватися на /.",
+  "serverFormatWrong": "Помилка формату імені сервера. Ім'я сервера має починатися на http(s):// і не заканчуватися на /.",
   "@serverFormatWrong": {
     "type": "text",
     "placeholders": {}

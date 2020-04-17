@@ -32,49 +32,43 @@ class PhotoselevenDB extends _$PhotoselevenDB {
 
   Future<List<Album>> get allAlbums => select(albums).get();
 
-  Future<List<Album>> get allAlbumsDescending =>
-      (select(albums)
+  Future<List<Album>> get allAlbumsDescending => (select(albums)
         ..orderBy(
             [(a) => OrderingTerm(expression: a.date, mode: OrderingMode.desc)]))
-          .get();
+      .get();
 
   Future<Album> getAlbumOnDate(DateTime date) {
-    return (select(albums)
-      ..where((a) => a.date.equals(date))).getSingle();
+    return (select(albums)..where((a) => a.date.equals(date))).getSingle();
   }
 
   Future<List<Photo>> getAlbumPhotos(Album album) {
-    return (select(photos)
-      ..where((p) => p.album.equals(album.id))).get();
+    return (select(photos)..where((p) => p.album.equals(album.id))).get();
   }
 
   Future<List<Photo>> getAlbumPhotosOrdered(Album album) {
     return (select(photos)
-      ..where((p) => p.album.equals(album.id))
-      ..orderBy([
-            (p) =>
-            OrderingTerm(
+          ..where((p) => p.album.equals(album.id))
+          ..orderBy([
+            (p) => OrderingTerm(
                 expression: p.createdOnText, mode: OrderingMode.desc)
-      ]))
+          ]))
         .get();
   }
 
   Future<Album> insertAlbum(AlbumsCompanion album) async {
     int id = await into(albums).insert(album);
-    return (select(albums)
-      ..where((a) => a.id.equals(id))).getSingle();
+    return (select(albums)..where((a) => a.id.equals(id))).getSingle();
   }
 
-  Future<Photo> insertPhoto(PhotosCompanion photosCompanion) async {
-    int photoID = await transaction(() async {
+  Future<void> insertPhoto(PhotosCompanion photosCompanion) async {
+    await transaction(() async {
       int id = await into(photos).insert(photosCompanion);
 
       var album = await (select(albums)
-        ..where((a) => a.id.equals(photosCompanion.album.value)))
+            ..where((a) => a.id.equals(photosCompanion.album.value)))
           .getSingle();
 
-      await (update(albums)
-        ..where((a) => a.id.equals(album.id))).write(
+      await (update(albums)..where((a) => a.id.equals(album.id))).write(
         AlbumsCompanion(
           id: Value(album.id),
           date: Value(album.date),
@@ -84,9 +78,6 @@ class PhotoselevenDB extends _$PhotoselevenDB {
 
       return id;
     });
-
-    return (select(photos)
-      ..where((a) => a.id.equals(photoID))).getSingle();
   }
 
   Future<void> dropAllData() async {
@@ -100,6 +91,14 @@ class PhotoselevenDB extends _$PhotoselevenDB {
   }
 
   Future<List<Photo>> get unuploadedPhotos =>
-      (select(photos)
-        ..where((p) => p.existRemote.equals(false))).get();
+      (select(photos)..where((p) => p.existRemote.equals(false))).get();
+
+  Future<void> markPhotoUploaded(Photo photo, String filePath) async {
+    PhotosCompanion companion = photo.createCompanion(true);
+    companion = companion.copyWith(
+        remoteUrl: Value(filePath), existRemote: Value(true));
+
+    return (update(photos)..where((p) => p.id.equals(photo.id)))
+        .write(companion);
+  }
 }

@@ -107,6 +107,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return message;
   }
 
+  Uri _getServerUri(String path) {
+    if (_serverName.startsWith('https://')) {
+      return Uri.https(_serverName.split('://')[1], path);
+    } else {
+      return Uri.http(_serverName.split('://')[1], path);
+    }
+  }
+
   Future<void> _loginOK() async {
     // After login OK removing any remaining data from previous sessions
     await PhotoselevenDB().dropAllData();
@@ -117,9 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushReplacementNamed(context, '/gallery');
   }
 
-
   Future<void> _loginPressed() async {
-
     bool connectionOk = await _testConnection(showAlerts: true);
     if (connectionOk) {
       if (_username.isEmpty || _password.isEmpty) {
@@ -130,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
           String body =
               json.encode({'username': _username, 'password': _password});
 
-          var loginResponse = await http.post(_serverName + 'api/auth/login',
+          var loginResponse = await http.post(_getServerUri('api/auth/login'),
               body: body,
               headers: {
                 HttpHeaders.contentTypeHeader: 'application/json'
@@ -156,8 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
           } else {
             var respJson = json.decode(loginResponse.body);
             var sp = await SharedPreferences.getInstance();
-            sp.setString("accessToken", respJson['token']);
-            sp.setString("username", _username);
+            sp.setString('accessToken', respJson['token']);
+            sp.setString('username', _username);
+            sp.setString('server', _serverName);
 
             _loginOK();
           }
@@ -166,6 +173,10 @@ class _LoginScreenState extends State<LoginScreen> {
               title: S.of(context).login,
               content: S.of(context).timeoutExceeded(_serverName));
         } on SocketException {
+          _showDialogWrapper(
+              title: S.of(context).login,
+              content: S.of(context).serverConnectionFailed(_serverName));
+        } on HandshakeException {
           _showDialogWrapper(
               title: S.of(context).login,
               content: S.of(context).serverConnectionFailed(_serverName));
@@ -193,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
         String body =
             json.encode({'username': _username, 'password': _password});
 
-        var regResponse = await http.post(_serverName + 'api/auth/users',
+        var regResponse = await http.post(_getServerUri('api/auth/users'),
             body: body,
             headers: {
               HttpHeaders.contentTypeHeader: 'application/json'
@@ -228,6 +239,10 @@ class _LoginScreenState extends State<LoginScreen> {
             title: S.of(context).register,
             content: S.of(context).timeoutExceeded(_serverName));
       } on SocketException {
+        _showDialogWrapper(
+            title: S.of(context).register,
+            content: S.of(context).serverConnectionFailed(_serverName));
+      } on HandshakeException {
         _showDialogWrapper(
             title: S.of(context).register,
             content: S.of(context).serverConnectionFailed(_serverName));
@@ -271,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return false;
     } else if (!(_serverName.startsWith('http://') ||
             _serverName.startsWith('https://')) ||
-        !_serverName.endsWith('/')) {
+        _serverName.endsWith('/')) {
       if (showAlerts) {
         _showDialogWrapper(
             title: S.of(context).connectionStatus,
@@ -281,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       try {
         var response =
-            await http.get(_serverName + 'ping').timeout(Duration(seconds: 3));
+            await http.get(_getServerUri('ping')).timeout(Duration(seconds: 3));
         if (response == null || response.statusCode != 200) {
           _showDialogWrapper(
               title: S.of(context).connectionStatus,

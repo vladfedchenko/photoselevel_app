@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:exif/exif.dart';
 import 'package:flutter/widgets.dart';
+import 'package:exif/exif.dart';
+import 'package:http/http.dart' as http;
 import 'package:moor/moor.dart';
+import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,12 +58,22 @@ class _GalleryScreenState extends State<GalleryScreen>
         }
         workAlbum = AlbumWithPhotos(tmp);
         this._albums[day] = workAlbum;
-
-        this._sortedAlbums = this._albums.values.toList();
-        this._sortedAlbums.sort((a, b) => b.album.date.compareTo(a.album.date));
+        setState(() {
+          this._sortedAlbums = this._albums.values.toList();
+          this._sortedAlbums.sort((a, b) => b.album.date.compareTo(a.album.date));
+        });
       }
       return workAlbum;
     });
+  }
+
+  Uri _getServerUri(String path) {
+    String server = _sharedPreferences.getString('server');
+    if (server.startsWith('https')) {
+      return Uri.https(server.split('://')[1], path);
+    } else {
+      return Uri.http(server.split('://')[1], path);
+    }
   }
 
   Future<bool> _doInitialLoad() async {
@@ -82,13 +95,13 @@ class _GalleryScreenState extends State<GalleryScreen>
       _processedTime =
           DateTime.parse(_sharedPreferences.getString('mediaLoadTime'));
     }
-    _tryLoadNewData();  // careful here, possible deadlock
+    _tryLoadNewData(); // careful here, possible deadlock
     return true;
   }
 
   Future<void> _loadNewLocalPhotos(List<File> photosList) async {
     for (File photoFile in photosList) {
-      var exifData = await readExifFromBytes(await photoFile.readAsBytes());
+      var exifData = await readExifFromFile(photoFile);
       if (exifData.containsKey('EXIF DateTimeOriginal') &&
           exifData.containsKey('EXIF SubSecTimeOriginal')) {
         // Creating ID
@@ -101,6 +114,10 @@ class _GalleryScreenState extends State<GalleryScreen>
             exifData['EXIF SubSecTimeOriginal'].printable;
 
         DateTime createdOn = DateTime.parse(dateTimeID);
+        if (dayTime[1].startsWith('24:')) {
+          // Library returns 12 AM as 24 and not 00 making day jump
+          createdOn = createdOn.subtract(Duration(days: 1));
+        }
         DateTime day = DateTime(createdOn.year, createdOn.month, createdOn.day);
 
         AlbumWithPhotos workAlbum = await _getAlbum(day);
@@ -111,7 +128,6 @@ class _GalleryScreenState extends State<GalleryScreen>
             localUrl: photoFile.uri.toFilePath(),
             createdOn: createdOn,
           );
-          setState(() {});
         }
       }
     }
@@ -148,14 +164,57 @@ class _GalleryScreenState extends State<GalleryScreen>
             'mediaLoadTime', this._processedTime.toString());
 
         await _uploadNewPhotos();
-
         _loadOngoing = false;
       }
     }
   }
 
   Future<void> _uploadNewPhotos() async {
-    // TODO: photos upload. Finish after backend part is improved.
+    List<Photo> toUpload = await PhotoselevenDB().unuploadedPhotos;
+    for (Photo photo in toUpload) {
+      var photoFile = File(photo.localUrl);
+      if (photoFile.existsSync()) {
+        var request = http.StreamedRequest(
+          'POST',
+          _getServerUri(
+              path.join('api/gallery/media', path.basename(photo.localUrl))),
+        );
+        request.headers.addAll({
+          'Content-Type': 'image/jpeg',
+          'Authorization':
+              'Bearer ${this._sharedPreferences.getString("accessToken")}'
+        });
+        request.contentLength = await photoFile.length();
+        photoFile
+            .openRead()
+            .listen(request.sink.add, onDone: () => request.sink.close());
+        try {
+          http.StreamedResponse respStream = await request.send();
+
+          if (respStream.statusCode == 201) {
+            http.Response response = await http.Response.fromStream(respStream);
+            var respJson = json.decode(response.body);
+            await PhotoselevenDB().markPhotoUploaded(
+                photo, _getServerUri(respJson['request_path']).toString());
+          }
+        } on SocketException {
+          // Thrown when server down and regular Request used
+          // TODO: notify that upload failed
+          break;
+        } on HandshakeException {
+          // Thrown when sending https request to http server
+          // TODO: notify that upload failed
+          break;
+        }
+        on StateError {
+          // Thrown when server down and StreamedRequest used
+          // TODO: notify that upload failed
+          break;
+        }
+      } else {
+        // TODO: remove file from DB.
+      }
+    }
   }
 
   @override
@@ -198,7 +257,6 @@ class _GalleryScreenState extends State<GalleryScreen>
 
   @override
   void initState() {
-    print('Init state called!');
     _initialLoadFinished = _doInitialLoad();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
